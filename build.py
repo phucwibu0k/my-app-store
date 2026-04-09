@@ -9,7 +9,7 @@ from datetime import datetime
 # --- CẤU HÌNH ---
 GITHUB_USERNAME = "phucwibu0k"
 REPO_NAME = "my-app-store"
-BASE_URL = f"https://{GITHUB_USERNAME}.github.io/{REPO_NAME}"
+BASE_URL = "https://phmod.qzz.io/"
 # ---------------
 
 def get_ipa_info(ipa_path):
