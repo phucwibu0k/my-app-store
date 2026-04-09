@@ -1,8 +1,9 @@
-name: Auto Build App Store
+name: Auto Build Multi-Page App Store
 
+# Kích hoạt khi Release được Tạo mới (published) hoặc Cập nhật sửa đổi (edited)
 on:
   release:
-    types: [published]
+    types: [published, edited]
   workflow_dispatch: 
 
 permissions:
@@ -22,30 +23,19 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Tải file IPA từ GitHub Release (Latest)
+      - name: Chạy hệ thống Quét App và Tạo Web
+        # Cấp quyền token để Python gọi API lấy danh sách file
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          mkdir -p apps
-          curl -sH "Authorization: token $GITHUB_TOKEN" \
-            https://api.github.com/repos/${{ github.repository }}/releases/latest \
-            | grep "browser_download_url.*ipa" \
-            | cut -d : -f 2,3 \
-            | tr -d \" \
-            | wget -qi - -P apps/
-
-      - name: Chạy Script xử lý IPA
         run: python build.py
 
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload dữ liệu
-        # Đã nâng cấp lên v3 để vượt qua lỗi chặn của GitHub
+      - name: Upload Website
         uses: actions/upload-pages-artifact@v3
         with:
           path: '.'
 
-      - name: Deploy lên GitHub Pages
-        # Đã nâng cấp lên v4
+      - name: Deploy lên mạng
         uses: actions/deploy-pages@v4
