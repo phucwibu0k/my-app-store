@@ -1,6 +1,5 @@
 name: Auto Build Multi-Page App Store
 
-# Kích hoạt khi Release được Tạo mới (published) hoặc Cập nhật sửa đổi (edited)
 on:
   release:
     types: [published, edited]
@@ -24,7 +23,6 @@ jobs:
           python-version: '3.10'
 
       - name: Chạy hệ thống Quét App và Tạo Web
-        # Cấp quyền token để Python gọi API lấy danh sách file
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python build.py
