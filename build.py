@@ -24,6 +24,7 @@ def get_ipa_info(ipa_path):
                     "name": plist_data.get('CFBundleDisplayName') or plist_data.get('CFBundleName', 'Unknown App'),
                     "id": plist_data.get('CFBundleIdentifier', 'com.unknown.app'),
                     "ver": plist_data.get('CFBundleShortVersionString', '1.0'),
+                    "filename": os.path.basename(ipa_path) # <--- MÌNH VỪA BỔ SUNG DÒNG NÀY
                 }
     except Exception as e:
         print(f"Lỗi khi đọc {ipa_path}: {e}")
@@ -32,7 +33,7 @@ def get_ipa_info(ipa_path):
 def main():
     print("Bắt đầu dọn dẹp và khởi tạo thư mục...")
     os.makedirs('plists', exist_ok=True)
-    os.makedirs('pages', exist_ok=True) # Thư mục chứa các web con
+    os.makedirs('pages', exist_ok=True)
     os.makedirs('temp_ipas', exist_ok=True)
 
     token = os.environ.get("GITHUB_TOKEN")
@@ -51,12 +52,10 @@ def main():
 
     apps_data = []
 
-    # 1. Quét toàn bộ Release để lấy IPA
     for rel in releases:
         tag_name = rel['tag_name']
         app_title = rel['name'] if rel['name'] else tag_name
         
-        # Tìm file .ipa trong release này
         ipa_asset = next((a for a in rel['assets'] if a['name'].endswith('.ipa')), None)
         if not ipa_asset:
             continue
@@ -73,15 +72,12 @@ def main():
             info['tag'] = tag_name
             info['release_name'] = app_title
             info['link'] = download_url
-            # Format ngày tháng
             date_obj = datetime.strptime(rel['published_at'], "%Y-%m-%dT%H:%M:%SZ")
             info['date'] = date_obj.strftime("%d/%m/%Y")
             apps_data.append(info)
 
-    # 2. Xây dựng giao diện (HTML Tổng và HTML Con)
     print("Bắt đầu tạo Website...")
     
-    # CSS dùng chung
     css_style = """
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f2f2f7; margin: 0; padding: 20px; color: #1c1c1e; }
@@ -99,7 +95,6 @@ def main():
     </style>
     """
 
-    # --- TẠO TRANG CHỦ (index.html) ---
     index_html = f"""<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Kho Ứng Dụng Cá Nhân</title>{css_style}</head><body><div class="container"><h1> App Store</h1>"""
 
     for app in apps_data:
@@ -107,12 +102,10 @@ def main():
         plist_path = os.path.join('plists', plist_filename)
         plist_url = f"{BASE_URL}/plists/{plist_filename}"
         
-        # Tạo file Plist
         plist_content = f"""<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict><key>items</key><array><dict><key>assets</key><array><dict><key>kind</key><string>software-package</string><key>url</key><string>{app['link']}</string></dict></array><key>metadata</key><dict><key>bundle-identifier</key><string>{app['id']}</string><key>bundle-version</key><string>{app['ver']}</string><key>kind</key><string>software</string><key>title</key><string>{app['name']}</string></dict></dict></array></dict></plist>"""
         with open(plist_path, 'w', encoding='utf-8') as f:
             f.write(plist_content)
 
-        # --- TẠO WEB CON (pages/tag_name.html) ---
         page_filename = f"{app['tag']}.html"
         page_path = os.path.join('pages', page_filename)
         page_html = f"""<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>{app['name']} - App Store</title>{css_style}</head><body><div class="container">
@@ -133,7 +126,6 @@ def main():
         with open(page_path, 'w', encoding='utf-8') as f:
             f.write(page_html)
 
-        # Thêm App vào list của Trang chủ
         index_html += f"""
         <div class="card">
             <div class="card-header">
