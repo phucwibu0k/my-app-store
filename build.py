@@ -23,8 +23,7 @@ def get_ipa_info(ipa_path):
                 return {
                     "name": plist_data.get('CFBundleDisplayName') or plist_data.get('CFBundleName', 'Unknown App'),
                     "id": plist_data.get('CFBundleIdentifier', 'com.unknown.app'),
-                    "ver": plist_data.get('CFBundleShortVersionString', '1.0'),
-                    "filename": os.path.basename(ipa_path) # <--- MÌNH VỪA BỔ SUNG DÒNG NÀY
+                    "ver": plist_data.get('CFBundleShortVersionString', '1.0')
                 }
     except Exception as e:
         print(f"Lỗi khi đọc {ipa_path}: {e}")
@@ -40,7 +39,8 @@ def main():
     api_url = f"https://api.github.com/repos/{GITHUB_USERNAME}/{REPO_NAME}/releases"
     
     req = urllib.request.Request(api_url)
-    req.add_header("Authorization", f"token {token}")
+    if token:
+        req.add_header("Authorization", f"token {token}")
     req.add_header("Accept", "application/vnd.github.v3+json")
 
     try:
@@ -65,15 +65,27 @@ def main():
         local_path = os.path.join('temp_ipas', file_name)
 
         print(f"Đang tải và phân tích: {app_title} (Tag: {tag_name})...")
-        urllib.request.urlretrieve(download_url, local_path)
+        try:
+            urllib.request.urlretrieve(download_url, local_path)
+        except Exception as e:
+            print(f"Lỗi tải file {file_name}: {e}")
+            continue
 
         info = get_ipa_info(local_path)
         if info:
             info['tag'] = tag_name
             info['release_name'] = app_title
             info['link'] = download_url
-            date_obj = datetime.strptime(rel['published_at'], "%Y-%m-%dT%H:%M:%SZ")
-            info['date'] = date_obj.strftime("%d/%m/%Y")
+            
+            # --- FIX CHÍNH LÀ Ở ĐÂY: Gán trực tiếp file_name vào bộ nhớ ---
+            info['filename'] = file_name 
+            
+            try:
+                date_obj = datetime.strptime(rel['published_at'], "%Y-%m-%dT%H:%M:%SZ")
+                info['date'] = date_obj.strftime("%d/%m/%Y")
+            except:
+                info['date'] = "Không rõ"
+                
             apps_data.append(info)
 
     print("Bắt đầu tạo Website...")
@@ -108,6 +120,13 @@ def main():
 
         page_filename = f"{app['tag']}.html"
         page_path = os.path.join('pages', page_filename)
+        
+        # --- FIX TÍNH TOÁN DUNG LƯỢNG AN TOÀN ---
+        try:
+            file_size_mb = f"~{round(os.path.getsize(os.path.join('temp_ipas', app['filename'])) / (1024*1024), 1)} MB"
+        except Exception:
+            file_size_mb = "Không xác định"
+
         page_html = f"""<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>{app['name']} - App Store</title>{css_style}</head><body><div class="container">
             <a href="../index.html" class="back-link">← Quay lại danh sách</a>
             <div class="card">
@@ -118,7 +137,7 @@ def main():
                 <div style="margin-bottom: 25px;">
                     <p class="meta-text"><strong>Tên gói (ID):</strong> {app['id']}</p>
                     <p class="meta-text"><strong>Cập nhật lần cuối:</strong> {app['date']}</p>
-                    <p class="meta-text"><strong>Kích thước:</strong> ~{round(os.path.getsize(os.path.join('temp_ipas', app['filename'])) / (1024*1024), 1)} MB</p>
+                    <p class="meta-text"><strong>Kích thước:</strong> {file_size_mb}</p>
                 </div>
                 <a href="itms-services://?action=download-manifest&url={plist_url}" class="btn">Cài đặt trực tiếp</a>
             </div>
