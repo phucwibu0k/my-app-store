@@ -1,6 +1,5 @@
 name: Auto Build App Store
 
-# 1. SỬA LỖI TRIGGER: Kích hoạt khi có Release mới được Publish
 on:
   release:
     types: [published]
@@ -16,14 +15,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Khởi tạo Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      # 2. SỬA LỖI THIẾU IPA: Tự động tải file IPA từ Release mới nhất về thư mục apps/
       - name: Tải file IPA từ GitHub Release (Latest)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -40,12 +38,14 @@ jobs:
         run: python build.py
 
       - name: Setup GitHub Pages
-        uses: actions/configure-pages@v3
+        uses: actions/configure-pages@v5
 
       - name: Upload dữ liệu
-        uses: actions/upload-pages-artifact@v2
+        # Đã nâng cấp lên v3 để vượt qua lỗi chặn của GitHub
+        uses: actions/upload-pages-artifact@v3
         with:
           path: '.'
 
       - name: Deploy lên GitHub Pages
-        uses: actions/deploy-pages@v2
+        # Đã nâng cấp lên v4
+        uses: actions/deploy-pages@v4
