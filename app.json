@@ -1,0 +1,16 @@
+[
+    {
+        "id": "app1",
+        "name": "Spotify Mod",
+        "bundle_id": "com.spotify.client",
+        "version": "8.8.0",
+        "ipa_link": "https://dl.dropboxusercontent.com/s/vi-du-link/spotify.ipa"
+    },
+    {
+        "id": "app2",
+        "name": "Youtube Reborn",
+        "bundle_id": "com.google.ios.youtube",
+        "version": "18.01.2",
+        "ipa_link": "https://dl.dropboxusercontent.com/s/vi-du-link-2/youtube.ipa"
+    }
+]
