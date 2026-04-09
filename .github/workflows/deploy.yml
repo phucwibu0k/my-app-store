@@ -6,7 +6,7 @@ on:
   workflow_dispatch: 
 
 permissions:
-  contents: read
+  contents: write   # CỰC KỲ QUAN TRỌNG: Cho phép Action lưu file ngược lại vào Repo
   pages: write
   id-token: write
 
@@ -16,16 +16,28 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Lấy toàn bộ lịch sử để commit không bị lỗi
 
       - name: Khởi tạo Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: Chạy hệ thống Quét App và Tạo Web
+      - name: Chạy hệ thống Quét App và Trích xuất Icon
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python build.py
+
+      - name: Lưu trữ Metadata và Icon (Để lần sau không phải tải lại IPA cũ)
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          # Thêm file metadata và toàn bộ icon mới vào hàng chờ
+          git add app_metadata.json icons/*.png || echo "Không có file mới"
+          # Commit nếu có thay đổi, nếu không có thì bỏ qua
+          git commit -m "Cập nhật dữ liệu app và icon [skip ci]" || echo "Không có gì thay đổi để lưu"
+          git push
 
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v5
