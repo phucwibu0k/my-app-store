@@ -5,7 +5,7 @@ GitHub Client – lấy danh sách Releases và parse release notes.
 import json
 import re
 import urllib.request
-from config import GITHUB_API, get_github_token
+from .config import GITHUB_API, get_github_token
 
 
 # ── Fetch ────────────────────────────────────────────────────────
