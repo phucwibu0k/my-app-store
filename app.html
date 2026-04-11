@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+<link id="favicon" rel="icon" type="image/png" href="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -141,6 +142,7 @@
                     iconImg.alt            = app.name;
                     iconImg.style.display  = 'block';
                     iconPlaceholder.style.display = 'none';
+                    favicon.href           = app.icon_url;
                 } else {
                     iconPlaceholder.innerText = app.name[0].toUpperCase();
                 }
