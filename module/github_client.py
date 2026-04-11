@@ -53,15 +53,40 @@ def parse_category(body: str) -> str:
     return "APP"
 
 
+def parse_direct_install(body: str) -> bool:
+    """
+    Trích xuất cờ direct_install từ release notes.
+
+    Format:
+        #direct_install: true
+        #direct_install: false
+
+    Mặc định trả về False nếu không tìm thấy.
+    """
+    if not body:
+        return False
+
+    for line in body.split("\n"):
+        line = line.strip()
+        if line.startswith("#direct_install:"):
+            match = re.match(r"#direct_install:\s*(\w+)", line)
+            if match:
+                return match.group(1).lower() == "true"
+
+    return False
+
+
 def parse_note(body: str) -> str:
     """
-    Trả về nội dung release notes sau khi loại bỏ dòng #category.
+    Trả về nội dung release notes sau khi loại bỏ các dòng metadata
+    (#category, #direct_install).
     """
     if not body:
         return ""
 
+    _META_PREFIXES = ("#category:", "#direct_install:")
     lines = [
         line for line in body.split("\n")
-        if not line.strip().startswith("#category:")
+        if not any(line.strip().startswith(p) for p in _META_PREFIXES)
     ]
     return "\n".join(lines).strip()
