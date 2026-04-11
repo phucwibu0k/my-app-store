@@ -2,8 +2,8 @@
 HTML Generator – tạo index.html hiển thị danh sách ứng dụng dạng card.
 """
 
-from config import OUTPUT_HTML
-from metadata_store import load_metadata
+from .config import OUTPUT_HTML
+from .metadata_store import load_metadata
 
 # ── CSS (tách ra để generate_index_html() gọn hơn) ───────────────
 

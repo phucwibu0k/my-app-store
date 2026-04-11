@@ -8,9 +8,15 @@ import os
 import urllib.request
 from datetime import datetime
 
+<<<<<<< HEAD
 from config import ICONS_DIR, METADATA_FILE, SCREENSHOTS_DIR, TEMP_IPA_DIR
 from github_client import fetch_releases, parse_category, parse_note
 from ipa_parser import extract_icon, get_ipa_info
+=======
+from .config import ICONS_DIR, METADATA_FILE, SCREENSHOTS_DIR, TEMP_IPA_DIR
+from .github_client import fetch_releases, parse_category, parse_direct_install, parse_note
+from .ipa_parser import extract_icon, get_ipa_info
+>>>>>>> 4a6af262368dc638e46e3315bfa9d6f356aeff8b
 
 
 # ── Đọc / ghi ────────────────────────────────────────────────────

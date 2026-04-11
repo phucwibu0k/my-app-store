@@ -4,23 +4,32 @@
         "id": "com.garena.game.kgvn2",
         "ver": "1.62.11625414",
         "tag": "lien_quan",
+        "category": "GAME",
+        "direct_install": true,
+        "note": "Hack Map Free, Đánh Kín = Ko Ban",
         "link": "https://github.com/phucwibu0k/my-app-store/releases/download/lien_quan/LQ.pH.Mod_1.62.11625414_1775743448.ipa",
         "asset_id": 392477073,
         "date": "09/04/2026",
         "has_icon": true,
         "icon_url": "icons/lien_quan.png",
-        "category": "GAMES"
+        "screenshots": [
+            "screenshots/lien_quan/SeaTalk_IMG_20240709_155503.png",
+            "screenshots/lien_quan/lq.png"
+        ]
     },
     "bawa": {
         "name": "Bawa",
         "id": "ali.Bawa",
         "ver": "1.1",
         "tag": "bawa",
+        "category": "APP",
+        "direct_install": false,
+        "note": "bawa download",
         "link": "https://github.com/phucwibu0k/my-app-store/releases/download/bawa/Bawa_1.1_1775754315.ipa",
         "asset_id": 392542558,
         "date": "09/04/2026",
         "has_icon": true,
         "icon_url": "icons/bawa.png",
-        "category": "APP"
+        "screenshots": []
     }
 }
