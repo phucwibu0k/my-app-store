@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{{APP_NAME}} - App Store</title>
+    <style>
+        :root { --blue: #007aff; --gray: #8e8e93; --light-gray: #f2f2f7; --overlay: rgba(0,0,0,0.4); }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff; margin: 0; padding: 20px; color: #1c1c1e; line-height: 1.4; -webkit-tap-highlight-color: transparent; }
+        
+        /* Header Section */
+        .header { display: flex; align-items: center; margin-bottom: 25px; }
+        .app-icon { width: 110px; height: 110px; border-radius: 22%; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 0.5px solid #eee; margin-right: 18px; }
+        .app-info-text h1 { font-size: 22px; font-weight: 700; margin: 0 0 4px 0; }
+        .app-info-text p { color: var(--gray); font-size: 14px; margin: 0; word-break: break-all; }
+
+        /* Actions */
+        .actions { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
+        .btn { display: block; text-align: center; padding: 12px; border-radius: 25px; font-weight: 700; text-decoration: none; font-size: 16px; cursor: pointer; border: none; transition: background 0.2s; }
+        .btn-install { background-color: var(--blue); color: white; }
+        .btn-ipa { background-color: var(--light-gray); color: var(--blue); }
+        .btn:active { opacity: 0.7; }
+
+        /* Metadata Grid - PHẦN HIỂN THỊ DATE VÀ VERSION */
+        .metadata-grid { display: grid; grid-template-columns: 1fr 1fr; border-top: 0.5px solid #eee; border-bottom: 0.5px solid #eee; padding: 15px 0; margin-bottom: 25px; }
+        .meta-item { text-align: center; }
+        .meta-item:first-child { border-right: 0.5px solid #eee; }
+        .meta-label { font-size: 11px; color: var(--gray); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+        .meta-value { font-size: 17px; font-weight: 600; color: #48484a; margin-top: 4px; }
+
+        /* Note Section */
+        .note-section { margin-bottom: 25px; border-bottom: 0.5px solid #eee; padding-bottom: 20px; }
+        .note-title { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+        .note-content { font-size: 15px; color: #3a3a3c; line-height: 1.6; white-space: pre-wrap; }
+
+        /* Screenshots */
+        .screenshots-title { font-size: 20px; font-weight: 700; margin-bottom: 15px; }
+        .screenshots-container { display: flex; overflow-x: auto; gap: 12px; padding-bottom: 10px; -webkit-overflow-scrolling: touch; }
+        .screenshots-container::-webkit-scrollbar { display: none; }
+        .screenshot-img { height: 380px; border-radius: 14px; border: 0.5px solid #ddd; object-fit: contain; background: #fdfdfd; }
+
+        /* Modal Popup */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--overlay); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+        .modal-box { background: white; width: 85%; max-width: 300px; border-radius: 14px; padding: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: zoomIn 0.2s ease-out; }
+        @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-title { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
+        .modal-body { font-size: 13px; color: #3a3a3c; margin-bottom: 20px; line-height: 1.4; }
+        .modal-actions { display: flex; flex-direction: column; gap: 8px; }
+        .modal-btn { padding: 12px; border-radius: 10px; font-weight: 600; text-decoration: none; font-size: 15px; border: none; cursor: pointer; }
+        .btn-confirm { background: var(--blue); color: white; }
+        .btn-close { background: #f2f2f7; color: #007aff; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="" alt="" id="appIcon" class="app-icon" style="display: none;">
+        <div id="iconPlaceholder" class="app-icon" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 40px; font-weight: bold;"></div>
+        <div class="app-info-text">
+            <h1 id="appName">Đang tải...</h1>
+            <p id="appId"></p>
+        </div>
+    </div>
+
+    <div class="actions">
+        <button onclick="showModal('install')" class="btn btn-install">CÀI ĐẶT TRỰC TIẾP</button>
+        <button onclick="showModal('ipa')" class="btn btn-ipa">TẢI FILE .IPA</button>
+    </div>
+
+    <div class="metadata-grid">
+        <div class="meta-item">
+            <div class="meta-label">PHIÊN BẢN</div>
+            <div class="meta-value" id="appVersion">-</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-label">CẬP NHẬT</div>
+            <div class="meta-value" id="appDate">-</div>
+        </div>
+    </div>
+
+    <div id="noteSection" class="note-section" style="display: none;">
+        <div class="note-title">Có gì mới</div>
+        <div id="noteContent" class="note-content"></div>
+    </div>
+
+    <div id="screenshotsSection" style="display: none;">
+        <div class="screenshots-title">Xem trước</div>
+        <div class="screenshots-container" id="screenshotsContainer">
+        </div>
+    </div>
+
+    <div id="downloadModal" class="modal-overlay">
+        <div class="modal-box">
+            <div id="modalTitle" class="modal-title">Thông báo</div>
+            <div class="modal-body" id="modalMsg"></div>
+            <div class="modal-actions">
+                <a id="confirmAction" href="#" class="modal-btn btn-confirm">TẢI VỀ</a>
+                <button onclick="closeModal()" class="modal-btn btn-close">HỦY BỎ</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let installUrl = "";
+        let ipaUrl = "";
+        let currentAppName = "";
+
+        async function initApp() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tag = urlParams.get('tag');
+            
+            if (!tag) {
+                alert("Không tìm thấy thông tin ứng dụng!");
+                window.location.href = "index.html";
+                return;
+            }
+
+            try {
+                const response = await fetch('app_metadata.json');
+                const metadata = await response.json();
+                const app = metadata[tag];
+
+                if (!app) {
+                    alert("Ứng dụng không tồn tại!");
+                    window.location.href = "index.html";
+                    return;
+                }
+
+                currentAppName = app.name;
+                document.title = `${app.name} - App Store`;
+                document.getElementById('appName').innerText = app.name;
+                document.getElementById('appId').innerText = app.id;
+                document.getElementById('appVersion').innerText = app.ver;
+                document.getElementById('appDate').innerText = app.date;
+
+                // Hiển thị ghi chú (note)
+                const noteSection = document.getElementById('noteSection');
+                const noteContent = document.getElementById('noteContent');
+                if (app.note && app.note.trim() !== "") {
+                    noteSection.style.display = 'block';
+                    noteContent.innerText = app.note;
+                } else {
+                    noteSection.style.display = 'none';
+                }
+
+                const iconImg = document.getElementById('appIcon');
+                const iconPlaceholder = document.getElementById('iconPlaceholder');
+                if (app.has_icon && app.icon_url) {
+                    iconImg.src = app.icon_url;
+                    iconImg.alt = app.name;
+                    iconImg.style.display = 'block';
+                    iconPlaceholder.style.display = 'none';
+                } else {
+                    iconPlaceholder.innerText = app.name[0].toUpperCase();
+                }
+
+                ipaUrl = app.link;
+                // Tạo link manifest giả định dựa trên cấu trúc thường thấy hoặc dùng link trực tiếp
+                installUrl = `itms-services://?action=download-manifest&url=${app.link.replace('.ipa', '.plist')}`;
+
+                // Hiển thị ảnh xem trước
+                const screenshotsContainer = document.getElementById('screenshotsContainer');
+                const screenshotsSection = document.getElementById('screenshotsSection');
+                
+                if (app.screenshots && app.screenshots.length > 0) {
+                    screenshotsSection.style.display = 'block';
+                    screenshotsContainer.innerHTML = app.screenshots.map(src => 
+                        `<img src="${src}" class="screenshot-img" alt="Preview">`
+                    ).join('');
+                } else {
+                    screenshotsSection.style.display = 'none';
+                }
+
+            } catch (error) {
+                console.error("Lỗi tải metadata:", error);
+                alert("Không thể tải thông tin ứng dụng.");
+            }
+        }
+
+        function showModal(type) {
+            const modal = document.getElementById('downloadModal');
+            const title = document.getElementById('modalTitle');
+            const msg = document.getElementById('modalMsg');
+            const confirmBtn = document.getElementById('confirmAction');
+
+            if (type === 'install') {
+                title.innerText = "Cài đặt ứng dụng";
+                msg.innerText = `Hệ thống sẽ cài đặt ${currentAppName} qua file Manifest. Sau khi tải, hãy vào Cài đặt chung > Quản lý VPN & Thiết bị để tin cậy nhà phát triển.`;
+                confirmBtn.href = installUrl;
+            } else {
+                title.innerText = "Tải xuống IPA";
+                msg.innerText = "Bạn đang tải xuống file cài đặt gốc. Bạn có thể sử dụng AltStore, Esign hoặc Sideloadly để cài đặt.";
+                confirmBtn.href = ipaUrl;
+            }
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('downloadModal').style.display = 'none'; }
+        window.onclick = function(e) { if (e.target.id == 'downloadModal') closeModal(); }
+
+        // Khởi tạo trang
+        initApp();
+    </script>
+</body>
+</html>

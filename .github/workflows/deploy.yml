@@ -1,0 +1,50 @@
+name: Auto Build Multi-Page App Store
+
+on:
+  release:
+    types: [published, edited]
+  workflow_dispatch: 
+
+permissions:
+  contents: write   # CỰC KỲ QUAN TRỌNG: Cho phép Action lưu file ngược lại vào Repo
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ref: main # <--- THÊM DÒNG NÀY ĐỂ BẮT BUỘC DÙNG NHÁNH MAIN
+          fetch-depth: 0
+
+      - name: Khởi tạo Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Chạy hệ thống Quét App và Trích xuất Icon
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python build.py
+
+      - name: Lưu trữ Metadata và Icon (Để lần sau không phải tải lại IPA cũ)
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add app_metadata.json icons/*.png || echo "Không có file mới"
+          git commit -m "Cập nhật dữ liệu app và icon [skip ci]" || echo "Không có gì thay đổi để lưu"
+          git push origin main # <--- THÊM 'origin main' VÀO ĐÂY
+          
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Website
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy lên mạng
+        uses: actions/deploy-pages@v4
