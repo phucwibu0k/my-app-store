@@ -1,4 +1,19 @@
 {
+    "freefire": {
+        "name": "FF•pH Mod",
+        "id": "ffv1.phmod",
+        "ver": "1.123.1",
+        "tag": "freefire",
+        "category": "GAME",
+        "direct_install": true,
+        "note": "Hack FF Free No Key, Có Menu, Ae Bắn Kín Ko Lộ Tránh Band",
+        "link": "https://github.com/phucwibu0k/my-app-store/releases/download/freefire/FF.pH.Mod_1.123.1_1775977168.ipa",
+        "asset_id": 394552536,
+        "date": "12/04/2026",
+        "has_icon": true,
+        "icon_url": "icons/freefire.png",
+        "screenshots": []
+    },
     "lien_quan": {
         "name": "LQ•pH Mod",
         "id": "com.garena.game.kgvn2",
