@@ -12,7 +12,10 @@
         "date": "12/04/2026",
         "has_icon": true,
         "icon_url": "icons/freefire.png",
-        "screenshots": []
+        "screenshots": [
+            "screenshots/freefire/D6BE8723-D3E7-4EF0-BE92-6271C930D546.png",
+            "screenshots/freefire/DF7C7AAB-5E13-49E5-9EBE-87795274BAE1.png"
+        ]
     },
     "lien_quan": {
         "name": "LQ•pH Mod",

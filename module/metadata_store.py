@@ -126,9 +126,21 @@ def update_metadata_from_releases() -> bool:
             continue
 
         # Đã cache và asset chưa thay đổi → bỏ qua
+        # Đã có cache nhưng vẫn cần cập nhật thông tin từ Release Note (body)
         if tag in old_metadata and old_metadata[tag].get('asset_id') == ipa_asset['id']:
-            print(f"⏭️ Bỏ qua (đã có cache): {tag}")
-            new_metadata[tag] = {**old_metadata[tag], "screenshots": screenshots}
+            print(f"🔄 Cập nhật nội dung ghi chú cho: {tag}")
+            
+            # Lấy dữ liệu cũ làm gốc
+            entry = old_metadata[tag].copy()
+            
+            # Cập nhật các trường có thể thay đổi trong Release Note
+            body = rel.get('body', '')
+            entry['category']       = parse_category(body)
+            entry['direct_install'] = parse_direct_install(body)
+            entry['note']           = parse_note(body)
+            entry['screenshots']    = screenshots # Cập nhật screenshots mới nhất
+            
+            new_metadata[tag] = entry
             continue
 
         print(f"📝 Xử lý: {tag}")
