@@ -308,10 +308,15 @@ class AppStore extends Component {
     return filteredApps
   }
 
-  onChangeSearchInput = event => {
+onChangeSearchInput = event => {
     this.setState({searchInput: event.target.value})
   }
-let searchResults
+
+  // Đã sửa lại hàm này cho đúng cú pháp
+  getSearchResults = () => {
+    const {searchInput, activeTabId} = this.state
+    let searchResults
+
     if (activeTabId === 'ALL') {
       searchResults = appsList.filter(eachItem =>
         eachItem.appName.toLowerCase().includes(searchInput.toLowerCase()),
@@ -322,10 +327,7 @@ let searchResults
           eachItem.appName.toLowerCase().includes(searchInput.toLowerCase()) &&
           eachItem.category === activeTabId,
       )
-    } eachItem =>
-        eachItem.appName.toLowerCase().includes(searchInput.toLowerCase()) &&
-        eachItem.category === activeTabId,
-    )
+    }
     return searchResults
   }
 
