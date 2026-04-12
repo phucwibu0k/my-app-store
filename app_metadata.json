@@ -28,8 +28,8 @@
         "has_icon": true,
         "icon_url": "icons/lien_quan.png",
         "screenshots": [
-            "screenshots/lien_quan/SeaTalk_IMG_20240709_155503.png",
-            "screenshots/lien_quan/lq.png"
+            "screenshots/lien_quan/lq.png",
+            "screenshots/lien_quan/SeaTalk_IMG_20240709_155503.png"
         ]
     },
     "bawa": {

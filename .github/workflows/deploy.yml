@@ -1,8 +1,6 @@
 name: Auto Build Multi-Page App Store
 
 on:
-  release:
-    types: [published, edited]
   workflow_dispatch: 
 
 permissions:
