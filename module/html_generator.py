@@ -84,17 +84,54 @@ _CSS = """
         header h1 { font-size: 1.8em; }
         .apps-grid { grid-template-columns: 1fr; }
     }
+    .stats { text-align: center; color: white; margin-bottom: 20px; font-size: 0.9em; }
+
+    /* THÊM CSS MỚI CHO THANH TÌM KIẾM TẠI ĐÂY */
+    .search-container { text-align: center; margin-bottom: 20px; }
+    .search-input {
+        padding: 12px 20px; width: 90%; max-width: 400px;
+        border-radius: 25px; border: 2px solid rgba(255,255,255,0.5);
+        outline: none; font-size: 1em; background: rgba(255,255,255,0.15);
+        color: white; transition: all 0.3s ease;
+    }
+    .search-input::placeholder { color: rgba(255,255,255,0.7); }
+    .search-input:focus { border-color: white; background: rgba(255,255,255,0.25); }
+
+    @media (max-width: 768px) {
+        header h1 { font-size: 1.8em; }
+        .apps-grid { grid-template-columns: 1fr; }
+    }
 </style>
 """
 
 _JS = """
 <script>
     function filterCategory(category) {
+        // Xóa nội dung ô tìm kiếm khi bấm lọc
+        document.getElementById('searchInput').value = '';
+        
         document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
         event.target.classList.add('active');
         document.querySelectorAll('.app-card').forEach(card => {
             card.style.display = (category === 'ALL' || card.dataset.category === category)
                 ? 'block' : 'none';
+        });
+    }
+
+    // THÊM HÀM TÌM KIẾM MỚI
+    function searchApps() {
+        const keyword = document.getElementById('searchInput').value.toLowerCase();
+        
+        // Bỏ active của các nút filter
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        
+        document.querySelectorAll('.app-card').forEach(card => {
+            const appName = card.querySelector('.app-name').innerText.toLowerCase();
+            if (appName.includes(keyword)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
         });
     }
 </script>
@@ -171,6 +208,10 @@ def generate_index_html() -> bool:
     </header>
 
     <div class="stats">Có {len(metadata)} ứng dụng • {len(categories)} danh mục</div>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="Tìm kiếm ứng dụng..." onkeyup="searchApps()">
+    </div>
 
     <div class="filter-tabs">
         {_filter_buttons(categories)}
