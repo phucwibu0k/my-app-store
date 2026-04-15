@@ -1,53 +1,21 @@
 {
-    "freefire": {
-        "name": "FF•pH Mod",
-        "id": "ffv1.phmod",
-        "ver": "1.123.1",
-        "tag": "freefire",
-        "category": "GAME",
-        "direct_install": true,
-        "note": "Hack FF Free No Key, Có Menu, Ae Bắn Kín Ko Lộ Tránh Band",
-        "link": "https://github.com/phucwibu0k/my-app-store/releases/download/freefire/FF.pH.Mod_1.123.1_1775977168.ipa",
-        "asset_id": 394552536,
-        "date": "12/04/2026",
-        "has_icon": true,
-        "icon_url": "icons/freefire.png",
-        "screenshots": [
-            "screenshots/freefire/D6BE8723-D3E7-4EF0-BE92-6271C930D546.png",
-            "screenshots/freefire/DF7C7AAB-5E13-49E5-9EBE-87795274BAE1.png"
-        ]
-    },
     "lien_quan": {
-        "name": "LQ•pH Mod",
-        "id": "com.garena.game.kgvn2",
-        "ver": "1.62.11625414",
+        "name": "LQ•Luxury",
+        "id": "lqmenu.luxury.phmod",
+        "ver": "1.62.11625415",
         "tag": "lien_quan",
         "category": "GAME",
         "direct_install": true,
-        "note": "Hack Map Free, Đánh Kín = Ko Ban",
-        "link": "https://github.com/phucwibu0k/my-app-store/releases/download/lien_quan/LQ.pH.Mod_1.62.11625414_1775743448.ipa",
-        "asset_id": 392477073,
-        "date": "09/04/2026",
+        "note": "->Ae nhấn 2 lần vào icon để bật tắt menu.\r\n->Ko bật các chức năng trong mục Auto Aim để tránh ban.\r\n->Đánh không lộ, là an toàn.",
+        "link": "https://github.com/phucwibu0k/my-app-store/releases/download/lien_quan/LQ.Luxury_1.62.11625415_1776242726.ipa",
+        "asset_id": 396945076,
+        "date": "15/04/2026",
         "has_icon": true,
         "icon_url": "icons/lien_quan.png",
         "screenshots": [
-            "screenshots/lien_quan/lq.png",
-            "screenshots/lien_quan/SeaTalk_IMG_20240709_155503.png"
+            "screenshots/lien_quan/IMG_5217.PNG",
+            "screenshots/lien_quan/IMG_5218.PNG",
+            "screenshots/lien_quan/IMG_5216.PNG"
         ]
-    },
-    "bawa": {
-        "name": "Bawa",
-        "id": "ali.Bawa",
-        "ver": "1.1",
-        "tag": "bawa",
-        "category": "APP",
-        "direct_install": false,
-        "note": "bawa download",
-        "link": "https://github.com/phucwibu0k/my-app-store/releases/download/bawa/Bawa_1.1_1775754315.ipa",
-        "asset_id": 392542558,
-        "date": "09/04/2026",
-        "has_icon": true,
-        "icon_url": "icons/bawa.png",
-        "screenshots": []
     }
 }
