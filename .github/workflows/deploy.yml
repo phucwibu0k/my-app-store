@@ -1,0 +1,60 @@
+name: Build and Deploy to Cloudflare Pages
+
+on:
+  workflow_dispatch: 
+
+# Thêm biến này để ép các Action chạy trên môi trường Node.js mới nhất, xóa cảnh báo vàng
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          
+      # BƯỚC MỚI: Cài đặt Node.js phiên bản mới (22 là bản ổn định nhất hiện nay)
+      - name: Khởi tạo Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Cài đặt pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Khởi tạo Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Cài đặt thư viện
+        run: pip install Pillow
+
+      - name: Chạy hệ thống Quét App và Trích xuất Icon
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python build.py
+
+      - name: Lưu trữ Metadata và Icon
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add app_metadata.json icons/*.png || echo "Không có file mới"
+          git commit -m "Cập nhật dữ liệu app và icon [skip ci]" || echo "Không có gì thay đổi để lưu"
+          git push origin main
+          
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy . --project-name=betastore

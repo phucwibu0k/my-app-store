@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="vi">
+<link id="favicon" rel="icon" type="image/png" href="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>App Store</title>
+    <style>
+        :root {
+            --blue: #007aff;
+            --gray: #8e8e93;
+            --light-gray: #f2f2f7;
+            --overlay: rgba(0,0,0,0.4);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            color: #1c1c1e;
+            line-height: 1.4;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ── Header ── */
+        .header { display: flex; align-items: center; margin-bottom: 25px; }
+        .app-icon {
+            width: 110px; height: 110px;
+            border-radius: 22%;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 0.5px solid #eee;
+            margin-right: 18px;
+        }
+        .app-info-text h1 { font-size: 22px; font-weight: 700; margin: 0 0 4px 0; }
+        .app-info-text p  { color: var(--gray); font-size: 14px; margin: 0; word-break: break-all; }
+
+        /* ── Action buttons ── */
+        .actions { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
+        .btn {
+            display: block;
+            text-align: center;
+            padding: 12px;
+            border-radius: 25px;
+            font-weight: 700;
+            text-decoration: none;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s;
+        }
+        .btn-install { background-color: var(--blue); color: white; }
+        .btn-ipa     { background-color: var(--light-gray); color: var(--blue); }
+        .btn:active  { opacity: 0.7; }
+
+        /* ── Metadata Grid ── */
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border-top: 0.5px solid #eee;
+            border-bottom: 0.5px solid #eee;
+            padding: 15px 0;
+            margin-bottom: 25px;
+        }
+        .meta-item { text-align: center; }
+        .meta-item:first-child { border-right: 0.5px solid #eee; }
+        .meta-label {
+            font-size: 11px;
+            color: var(--gray);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .meta-value { font-size: 17px; font-weight: 600; color: #48484a; margin-top: 4px; }
+
+        /* ── Note section ── */
+        .note-section { margin-bottom: 25px; border-bottom: 0.5px solid #eee; padding-bottom: 20px; }
+        .note-title   { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+        .note-content { font-size: 15px; color: #3a3a3c; line-height: 1.6; white-space: pre-wrap; }
+
+        /* ── Screenshots ── */
+        .screenshots-title { font-size: 20px; font-weight: 700; margin-bottom: 15px; }
+        .screenshots-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 12px;
+            padding-bottom: 10px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .screenshots-container::-webkit-scrollbar { display: none; }
+        
+        /* Thay thế class cũ thành class này dùng chung cho cả Ảnh và Video */
+        .screenshot-media {
+            width: 260px;          /* Cố định chiều rộng (thay vì chiều cao) */
+            height: auto;          /* Chiều cao tự động nhảy theo tỉ lệ ảnh */
+            max-width: 85vw;       /* Đảm bảo không vượt quá 85% bề ngang màn hình */
+            border-radius: 14px;
+            border: 0.5px solid #ddd;
+            background: #fdfdfd;
+            flex-shrink: 0;        /* Giữ nguyên kích thước trong flex container */
+            object-fit: cover;     /* Giúp ảnh lấp đầy khung hình nếu có tỉ lệ lạ */
+        }
+
+        /* ── Modal ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: var(--overlay);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+        .modal-box {
+            background: white;
+            width: 88%;
+            max-width: 320px;
+            border-radius: 16px;
+            padding: 22px 20px 18px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: zoomIn 0.2s ease-out;
+        }
+        @keyframes zoomIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to   { transform: scale(1);   opacity: 1; }
+        }
+        .modal-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+        .modal-body  {
+            font-size: 13px;
+            color: #3a3a3c;
+            margin-bottom: 18px;
+            line-height: 1.45;
+        }
+
+        /* ── Modal link buttons ── */
+        .modal-links { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+        .link-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: opacity 0.2s;
+        }
+        .link-btn:active { opacity: 0.7; }
+        .link-btn-primary   { background: var(--blue); color: white; }
+        .link-btn-secondary { background: var(--light-gray); color: var(--blue); }
+        .link-btn-label { flex: 1; text-align: left; }
+        .link-btn-badge {
+            background: rgba(255,255,255,0.25);
+            color: inherit;
+            font-size: 11px;
+            padding: 2px 7px;
+            border-radius: 8px;
+            margin-left: 8px;
+            font-weight: 500;
+        }
+        .link-btn-secondary .link-btn-badge { background: rgba(0,122,255,0.12); }
+
+        /* Fallback khi chưa có link rút gọn */
+        .link-btn-fallback { background: #f2f2f7; color: #48484a; }
+
+        .modal-close {
+            width: 100%;
+            padding: 11px;
+            border-radius: 12px;
+            background: #f2f2f7;
+            color: var(--blue);
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
+        .modal-close:active { opacity: 0.7; }
+
+        /* ── Image Viewer (Phóng to ảnh) ── */
+        .image-viewer-overlay {
+            display: none;
+            position: fixed;
+            z-index: 2000; /* Phải lớn hơn modal download (1000) */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.92);
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.2s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .image-viewer-content {
+            width: 100%; /* Cố định 100% chiều ngang màn hình */
+            max-width: 100vw;
+            height: auto;
+            max-height: 95vh; /* Ngăn ảnh quá dài bị tràn khỏi màn hình */
+            object-fit: contain;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        .image-viewer-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: #fff;
+            font-size: 38px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 2001;
+            padding: 10px;
+            line-height: 1;
+        }
+        .image-viewer-close:active {
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ── Header ── -->
+    <div class="header">
+        <img src="" alt="" id="appIcon" class="app-icon" style="display:none;">
+        <div id="iconPlaceholder" class="app-icon"
+             style="display:flex; align-items:center; justify-content:center;
+                    background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+                    color:white; font-size:40px; font-weight:bold;"></div>
+        <div class="app-info-text">
+            <h1 id="appName">Đang tải...</h1>
+            <p id="appId"></p>
+        </div>
+    </div>
+
+    <!-- ── Action buttons ── -->
+    <div class="actions">
+        <button id="btnInstall" onclick="showModal('install')"
+                class="btn btn-install" style="display:none;">
+            CÀI ĐẶT TRỰC TIẾP
+        </button>
+        <button onclick="showModal('ipa')" class="btn btn-ipa">TẢI FILE .IPA</button>
+    </div>
+
+    <!-- ── Metadata ── -->
+    <div class="metadata-grid">
+        <div class="meta-item">
+            <div class="meta-label">PHIÊN BẢN</div>
+            <div class="meta-value" id="appVersion">-</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-label">CẬP NHẬT</div>
+            <div class="meta-value" id="appDate">-</div>
+        </div>
+    </div>
+
+    <!-- ── Note ── -->
+    <div id="noteSection" class="note-section" style="display:none;">
+        <div class="note-title">Có gì mới</div>
+        <div id="noteContent" class="note-content"></div>
+    </div>
+
+    <!-- ── Screenshots ── -->
+    <div id="screenshotsSection" style="display:none;">
+        <div class="screenshots-title">Xem trước</div>
+        <div class="screenshots-container" id="screenshotsContainer"></div>
+    </div>
+
+    <!-- ── Modal ── -->
+    <div id="downloadModal" class="modal-overlay">
+        <div class="modal-box">
+            <div id="modalTitle" class="modal-title">Thông báo</div>
+            <div class="modal-body" id="modalMsg"></div>
+            <div class="modal-links" id="modalLinks"></div>
+            <button onclick="closeModal()" class="modal-close">Đóng</button>
+        </div>
+    </div>
+    
+    <div id="imageViewer" class="image-viewer-overlay" onclick="closeViewerClickOutside(event)">
+        <span class="image-viewer-close" onclick="closeImageViewer()">&times;</span>
+        <img id="imageViewerImg" class="image-viewer-content" src="" alt="Phóng to">
+    </div>
+    
+    <!-- ── Khung ảnh ── -->
+    <script>
+        /* ── Dữ liệu app (đọc từ metadata) ── */
+        let appData = {};
+
+        /* ── Khởi tạo trang ── */
+        async function initApp() {
+            const tag = new URLSearchParams(window.location.search).get('tag');
+            if (!tag) {
+                alert("Không tìm thấy thông tin ứng dụng!");
+                window.location.href = "index.html";
+                return;
+            }
+
+            try {
+                const res  = await fetch('app_metadata.json');
+                const meta = await res.json();
+                appData    = meta[tag];
+
+                if (!appData) {
+                    alert("Ứng dụng không tồn tại!");
+                    window.location.href = "index.html";
+                    return;
+                }
+
+                document.title = `${appData.name} - App Store`;
+                document.getElementById('appName').innerText    = appData.name;
+                document.getElementById('appId').innerText      = appData.id;
+                document.getElementById('appVersion').innerText = appData.ver;
+                document.getElementById('appDate').innerText    = appData.date;
+
+                /* Icon */
+                const iconImg         = document.getElementById('appIcon');
+                const iconPlaceholder = document.getElementById('iconPlaceholder');
+                if (appData.has_icon && appData.icon_url) {
+                    iconImg.src                   = appData.icon_url;
+                    iconImg.alt                   = appData.name;
+                    iconImg.style.display         = 'block';
+                    iconPlaceholder.style.display = 'none';
+                    favicon.href                  = appData.icon_url;
+                } else {
+                    iconPlaceholder.innerText = appData.name[0].toUpperCase();
+                }
+
+                /* Nút cài trực tiếp */
+                if (appData.direct_install === true) {
+                    document.getElementById('btnInstall').style.display = 'block';
+                }
+
+                /* Ghi chú */
+                if (appData.note && appData.note.trim() !== "") {
+                    document.getElementById('noteSection').style.display = 'block';
+                    document.getElementById('noteContent').innerText = appData.note;
+                }
+
+                /* ── Screenshots & Videos (Đã làm sạch) ── */
+                const container = document.getElementById('screenshotsContainer');
+                container.innerHTML = '';
+                let hasMedia = false;
+
+                // 1. Nhúng Video (nếu có trường #video: trong release)
+                if (appData.video) {
+                    hasMedia = true;
+                    // Dùng HTML thuần, thiết lập sẵn thuộc tính cho iOS Safari
+                    container.innerHTML += `
+                        <div style="flex-shrink: 0; position: relative;">
+                            <video class="screenshot-media" controls playsinline webkit-playsinline muted preload="metadata" src="${appData.video}"></video>
+                        </div>
+                    `;
+                }
+
+                // 2. Nhúng Ảnh (từ mảng screenshots)
+                if (appData.screenshots && appData.screenshots.length > 0) {
+                    hasMedia = true;
+                    appData.screenshots.forEach(src => {
+                        container.innerHTML += `<img src="${src}" class="screenshot-media" alt="Preview" onclick="openImageViewer('${src}')">`;
+                    });
+                }
+
+                // 3. Hiển thị khu vực xem trước nếu có video hoặc ảnh
+                if (hasMedia) {
+                    document.getElementById('screenshotsSection').style.display = 'block';
+                }
+
+            } catch (err) {
+                console.error("Lỗi tải metadata:", err);
+                alert("Không thể tải thông tin ứng dụng.");
+            }
+        }
+
+        /* ── Tạo nội dung modal ── */
+        function buildModalLinks(type) {
+            const ipaUrl     = appData.link || "";
+            const installUrl = ipaUrl
+                ? `itms-services://?action=download-manifest&url=${ipaUrl.replace('.ipa', '.plist')}`
+                : "";
+
+            let link1, link2, label1, label2;
+
+            if (type === 'install') {
+                link1  = appData.short_install_1 || installUrl;
+                link2  = appData.short_install_2 || "";
+                label1 = "Cài qua link 1";
+                label2 = "Cài qua link 2";
+            } else {
+                link1  = appData.short_ipa_1 || ipaUrl;
+                link2  = appData.short_ipa_2 || "";
+                label1 = "Tải IPA (link 1)";
+                label2 = "Tải IPA (link 2)";
+            }
+
+            let html = "";
+
+            /* Nút link 1 */
+            if (link1) {
+                html += `
+                  <a href="${link1}" class="link-btn link-btn-primary">
+                    <span class="link-btn-label">${label1}</span>
+                    <span class="link-btn-badge">Chính</span>
+                  </a>`;
+            }
+
+            /* Nút link 2 (chỉ hiện khi có) */
+            if (link2) {
+                html += `
+                  <a href="${link2}" class="link-btn link-btn-secondary">
+                    <span class="link-btn-label">${label2}</span>
+                    <span class="link-btn-badge">Dự phòng</span>
+                  </a>`;
+            }
+
+            /* Không có link rút gọn, dùng link gốc làm dự phòng */
+            if (!link1 && !link2) {
+                const fallback = type === 'install' ? installUrl : ipaUrl;
+                html = `
+                  <a href="${fallback}" class="link-btn link-btn-fallback">
+                    <span class="link-btn-label">Tiếp tục</span>
+                  </a>`;
+            }
+
+            return html;
+        }
+
+        function showModal(type) {
+            const title = document.getElementById('modalTitle');
+            const msg   = document.getElementById('modalMsg');
+            const links = document.getElementById('modalLinks');
+
+            if (type === 'install') {
+                title.innerText = "Cài đặt ứng dụng";
+                msg.innerText   =
+                    `Chọn link để cài đặt ${appData.name}. Sau khi tải xong, ` +
+                    "vào Cài đặt › Chung › Quản lý VPN & Thiết bị để tin cậy nhà phát triển.";
+            } else {
+                title.innerText = "Tải xuống IPA";
+                msg.innerText   =
+                    "Chọn link để tải file .ipa. Dùng AltStore, Esign hoặc Sideloadly để cài đặt.";
+            }
+
+            links.innerHTML = buildModalLinks(type);
+            document.getElementById('downloadModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('downloadModal').style.display = 'none';
+        }
+
+        window.onclick = e => {
+            if (e.target.id === 'downloadModal') closeModal();
+        };
+        // Thêm vào cuối <script> hiện tại, trước dòng initApp();
+        document.addEventListener('click', function(e) {
+            if (e.target.tagName === 'VIDEO') {
+                e.target.muted = false;
+            }
+        }, true);
+
+        /* ── Logic xem ảnh phóng to ── */
+        function openImageViewer(src) {
+            const viewer = document.getElementById('imageViewer');
+            const img = document.getElementById('imageViewerImg');
+            img.src = src;
+            viewer.style.display = 'flex'; // Hiển thị khung
+        }
+
+        function closeImageViewer() {
+            const viewer = document.getElementById('imageViewer');
+            viewer.style.display = 'none'; // Ẩn khung
+            document.getElementById('imageViewerImg').src = ""; // Xoá src để tránh giật hình lần mở sau
+        }
+
+        function closeViewerClickOutside(event) {
+            // Đóng ảnh nếu người dùng click vào vùng đen (bên ngoài bức ảnh)
+            if (event.target.id === 'imageViewer') {
+                closeImageViewer();
+            }
+        }
+        
+        initApp();
+    </script>
+</body>
+</html>
